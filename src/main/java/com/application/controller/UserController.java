@@ -118,6 +118,10 @@ public class UserController
 //	@CrossOrigin(origins = "http://localhost:4202")
 	public ResponseEntity<Appointments> addNewAppointment(@RequestBody Appointments appointment) throws Exception {
 
+
+		System.out.println("calling appoimnet");
+
+		System.out.println("Appoiment:"+appointment);
 		// ✅ Date normalization
 		String[] dateArr = appointment.getDate().split("-");
 		appointment.setDate(dateArr[0] + "-" + dateArr[1] + "-" + dateArr[2]);

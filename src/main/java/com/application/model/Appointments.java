@@ -153,4 +153,22 @@ public class Appointments
 		this.admissionstatus = admissionstatus;
 	}
 
+	@Override
+	public String toString() {
+		return "Appointments{" +
+				"id=" + id +
+				", patientid='" + patientid + '\'' +
+				", patientname='" + patientname + '\'' +
+				", email='" + email + '\'' +
+				", doctorname='" + doctorname + '\'' +
+				", specialization='" + specialization + '\'' +
+				", date='" + date + '\'' +
+				", age='" + age + '\'' +
+				", gender='" + gender + '\'' +
+				", problem='" + problem + '\'' +
+				", slot='" + slot + '\'' +
+				", appointmentstatus='" + appointmentstatus + '\'' +
+				", admissionstatus='" + admissionstatus + '\'' +
+				'}';
+	}
 }
