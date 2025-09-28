@@ -19,6 +19,11 @@ import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.application.filter.JwtFilter;
 import com.application.service.UserRegistrationService;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @SuppressWarnings("unused")
 @Configuration
@@ -50,7 +55,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 
 	protected void configure(HttpSecurity http) throws Exception
 	{
-        http.csrf().disable().authorizeRequests().antMatchers("/authenticate")
+        http
+				.cors().and()
+				.csrf().disable().authorizeRequests().antMatchers("/authenticate")
+
                 .permitAll().antMatchers("/","/loginuser","/logindoctor","/loginadmin","/registeruser","/registerdoctor","/registeradmin","/addDoctor","/gettotalusers")
                 .permitAll().antMatchers("/doctorlist","/gettotaldoctors","/gettotalslots","/acceptstatus/{email}","/rejectstatus/{email}","/acceptpatient/{slot}","/rejectpatient/{slot}")
                 .permitAll().antMatchers("/addBookingSlots","/doctorlistbyemail/{email}","/slotDetails/{email}","/slotDetails","/slotDetailsWithUniqueDoctors","/slotDetailsWithUniqueSpecializations","/patientlistbydoctoremail/{email}")
@@ -66,4 +74,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore((Filter) jwtFilter, UsernamePasswordAuthenticationFilter.class);;
     }
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(List.of("*"));
+		configuration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 }

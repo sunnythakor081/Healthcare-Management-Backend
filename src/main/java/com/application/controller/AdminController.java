@@ -192,7 +192,9 @@ public class AdminController
         // Get total prescriptions
         List<Prescription> prescriptions = prescriptionService.getAllPrescriptions();
         stats.put("totalPrescriptions", prescriptions.size());
-        
+
+        int totalPatients = (int) appointments.stream().map(Appointments::getPatientname).distinct().count(); // Unique kar
+        stats.put("totalPatients", totalPatients);
         return new ResponseEntity<Map<String, Integer>>(stats, HttpStatus.OK);
     }
     
