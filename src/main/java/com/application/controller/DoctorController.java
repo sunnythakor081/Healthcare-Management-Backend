@@ -1,11 +1,9 @@
 package com.application.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.LinkedHashSet;
+import java.util.*;
+
+import com.application.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.application.model.Appointments;
-import com.application.model.Doctor;
-import com.application.model.Prescription;
-import com.application.model.Slots;
 import com.application.service.AppointmentBookingService;
 import com.application.service.DoctorRegistrationService;
 import com.application.service.PrescriptionService;
@@ -36,7 +30,34 @@ public class DoctorController
 	
 	@Autowired
 	private PrescriptionService prescriptionService;
-	
+
+
+	@GetMapping("/doctor/dashboard")
+//    @CrossOrigin(origins = "http://localhost:4202")
+	public ResponseEntity<Map<String, Integer>> getDashboardStats() throws Exception
+	{
+		Map<String, Integer> stats = new HashMap<>();
+
+
+		// Get total doctors
+		List<Doctor> doctors = doctorRegisterService.getAllDoctors();
+		stats.put("totalDoctors", doctors.size());
+
+		// Get total slots
+		List<Slots> slots = appointmentBookingService.getSlotList();
+		stats.put("totalSlots", slots.size());
+
+		// Get total appointments
+		List<Appointments> appointments = appointmentBookingService.getAllAppointments();
+
+		// Get total prescriptions
+		List<Prescription> prescriptions = prescriptionService.getAllPrescriptions();
+		stats.put("totalPrescriptions", prescriptions.size());
+
+		int totalPatients = (int) appointments.stream().map(Appointments::getPatientname).distinct().count(); // Unique kar
+		stats.put("totalPatients", totalPatients);
+		return new ResponseEntity<Map<String, Integer>>(stats, HttpStatus.OK);
+	}
 	@GetMapping("/doctorlist")
 //	@CrossOrigin(origins = "http://localhost:4205")
 	public ResponseEntity<List<Doctor>> getDoctors() throws Exception
