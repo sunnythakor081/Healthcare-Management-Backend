@@ -7,13 +7,7 @@ import com.application.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.application.service.AppointmentBookingService;
 import com.application.service.DoctorRegistrationService;
 import com.application.service.PrescriptionService;
@@ -216,30 +210,30 @@ public class DoctorController
 		List<Appointments> patients = appointmentBookingService.findPatientByDoctorName(doctorname);
 		return new ResponseEntity<List<Appointments>>(patients, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/addPrescription")
-//	@CrossOrigin(origins = "http://localhost:4205")
-	public ResponseEntity<Prescription> addNewPrescription(@RequestBody Prescription prescription) throws Exception
-	{
-		List<Appointments> patients = appointmentBookingService.getAllPatients();
-		String patientID = "";
-		OUTER:for(Appointments obj : patients)
-		{
-			if(obj.getPatientname().equals(prescription.getPatientname()))
-			{
-				patientID = obj.getPatientid();
-				break OUTER;
+	public ResponseEntity<?> addNewPrescription(@RequestBody Prescription prescription) {
+		try {
+			List<Appointments> patients = appointmentBookingService.getAllPatients();
+			String patientID = patients.stream()
+					.filter(obj -> obj.getPatientname().equals(prescription.getPatientname()))
+					.findFirst()
+					.map(Appointments::getPatientid)
+					.orElse(null);
+			if (patientID == null) {
+				return new ResponseEntity<>("Patient not found", HttpStatus.BAD_REQUEST);
 			}
+			prescription.setPatientid(patientID);
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			Date date = new Date();
+			prescription.setDate(formatter.format(date));
+
+			Prescription savedPrescription = prescriptionService.savePrescriptions(prescription);
+			return new ResponseEntity<>(savedPrescription, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>("Error saving prescription: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		prescription.setPatientid(patientID);
-		
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");  
-        Date date = new Date();  
-        String todayDate = formatter.format(date);
-        prescription.setDate(todayDate);
-        
-		Prescription prescriptions = prescriptionService.savePrescriptions(prescription);
-		return new ResponseEntity<Prescription>(prescriptions, HttpStatus.OK);
 	}
 	
 	@GetMapping("/doctorProfileDetails/{email}")
@@ -288,5 +282,7 @@ public class DoctorController
 		}
 		return new ResponseEntity<List<Appointments>>(appointmentsList, HttpStatus.OK);
 	}
+
+
 	
 }
