@@ -63,9 +63,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .permitAll().antMatchers("/doctorlist","/gettotaldoctors","/gettotalslots","/acceptstatus/{email}","/rejectstatus/{email}","/acceptpatient/{slot}","/rejectpatient/{slot}")
                 .permitAll().antMatchers("/addBookingSlots","/doctorlistbyemail/{email}","/slotDetails/{email}","/slotDetails","/slotDetailsWithUniqueDoctors","/slotDetailsWithUniqueSpecializations","/patientlistbydoctoremail/{email}")
                 .permitAll().antMatchers("/addPrescription","/doctorProfileDetails/{email}","/updatedoctor","/patientlistbydoctoremailanddate/{email}","/userlist","/getprescriptionbyname/{patientname}","/patientlistbyemail/{email}")
-                .permitAll().antMatchers("/patientlist","/gettotalpatients","/gettotalappointments","/gettotalprescriptions","/profileDetails/{email}","/updateuser","/bookNewAppointment")
+                .permitAll().antMatchers("/patientlist","/gettotalpatients","/gettotalappointments","/gettotalprescriptions","/profileDetails/{email}","/updateuser/**","/bookNewAppointment")
                 .permitAll().antMatchers("/admin/**","/getadmin")
-                .permitAll().anyRequest().fullyAuthenticated()
+
+
+
+				.permitAll().anyRequest().fullyAuthenticated()
                 .and().exceptionHandling()
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
                     AccessDeniedHandler defaultAccessDeniedHandler = new AccessDeniedHandlerImpl();

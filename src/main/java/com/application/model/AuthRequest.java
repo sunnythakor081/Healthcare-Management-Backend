@@ -1,9 +1,14 @@
 package com.application.model;
 
 import lombok.Data;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 @Data
 public class AuthRequest 
 {
+
 	 private String email;
 	 private String password;
 	 

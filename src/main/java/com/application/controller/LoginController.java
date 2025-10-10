@@ -48,8 +48,8 @@ public class LoginController
     }
     
     @PostMapping("/authenticate")
-    @CrossOrigin(origins = "http://localhost:4200" +
-			"")
+//    @CrossOrigin(origins = "http://localhost:4200" +
+//			"")
     public ResponseEntity<String> generateToken(@RequestBody AuthRequest authRequest) throws Exception 
     {
         try 

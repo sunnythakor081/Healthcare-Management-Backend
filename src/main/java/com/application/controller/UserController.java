@@ -115,14 +115,12 @@ public class UserController
 	}
 
 	@PostMapping("/bookNewAppointment")
-//	@CrossOrigin(origins = "http://localhost:4202")
 	public ResponseEntity<Appointments> addNewAppointment(@RequestBody Appointments appointment) throws Exception {
 
+		System.out.println("calling appointment");
+		System.out.println("Appointment:" + appointment);
 
-		System.out.println("calling appoimnet");
-
-		System.out.println("Appoiment:"+appointment);
-		// ✅ Date normalization
+		// ✅ Date normalization (already hai)
 		String[] dateArr = appointment.getDate().split("-");
 		appointment.setDate(dateArr[0] + "-" + dateArr[1] + "-" + dateArr[2]);
 		System.out.println(appointment.getDate());
@@ -141,7 +139,7 @@ public class UserController
 			throw new Exception("No slots available for this date !!! Please check the slot availability and book again.");
 		}
 
-		// ✅ Doctor & Date matching with null safe comparison
+		// ✅ Doctor & Date matching with null safe comparison (already hai)
 		Slots obj = null;
 		for (Slots obj1 : availableSLots) {
 			if (Objects.equals(obj1.getDoctorname(), appointments.getDoctorname()) &&
@@ -151,23 +149,31 @@ public class UserController
 			}
 		}
 
-		// ✅ Handle no doctor slots found case
+		// ✅ Handle no doctor slots found case (already hai)
 		if (obj == null) {
 			throw new Exception("The Doctor has no slots on that date !!! Please check the slot availability and book again.");
 		}
 
-		// ✅ Slot availability checks with correct status fields
-		if (appointments.getSlot().equalsIgnoreCase("AM slot") && "booked".equalsIgnoreCase(obj.getAmstatus())) {
-			throw new Exception(message);
+		// ✅ NEW: Slot availability checks - ab full time string ke basis pe check karo
+		String selectedSlot = appointments.getSlot();  // Yeh ab "9.00 AM - 11.00 AM" jaise full time hai
+		boolean isAvailable = false;
+
+		// Determine which slot type it is and check status
+		if (selectedSlot.toLowerCase().contains("am") && !"booked".equalsIgnoreCase(obj.getAmstatus())) {
+			isAvailable = true;
+		} else if (selectedSlot.toLowerCase().contains("noon") || (selectedSlot.toLowerCase().contains("pm") && selectedSlot.contains("1.") || selectedSlot.contains("2."))) {  // Noon/Afternoon check
+			if (!"booked".equalsIgnoreCase(obj.getNoonstatus())) {
+				isAvailable = true;
+			}
+		} else if (selectedSlot.toLowerCase().contains("pm") && !"booked".equalsIgnoreCase(obj.getPmstatus())) {  // Evening PM
+			isAvailable = true;
 		}
-		if (appointments.getSlot().equalsIgnoreCase("PM slot") && "booked".equalsIgnoreCase(obj.getPmstatus())) {
-			throw new Exception(message);
-		}
-		if (appointments.getSlot().equalsIgnoreCase("Noon slot") && "booked".equalsIgnoreCase(obj.getNoonstatus())) {
+
+		if (!isAvailable) {
 			throw new Exception(message);
 		}
 
-		// ✅ Save appointment
+		// ✅ Save appointment - slot field mein full time already store ho jayega (kyuki frontend se aaya)
 		appointments = appointmentBookingService.addNewAppointment(appointment);
 
 		String patientID = getPatientID();
@@ -176,20 +182,17 @@ public class UserController
 				appointment.getPatientname(),
 				appointment.getDate());
 
-		// ✅ Book slot if unbooked
-		if (appointments.getSlot().equalsIgnoreCase("PM slot") && "unbooked".equalsIgnoreCase(obj.getPmstatus())) {
-			appointmentBookingService.bookPMSlot(appointment.getDoctorname(), appointment.getDate());
-		}
-		if (appointments.getSlot().equalsIgnoreCase("AM slot") && "unbooked".equalsIgnoreCase(obj.getAmstatus())) {
+		// ✅ Book slot if unbooked - time ke basis pe decide karo kaun sa update
+		if (selectedSlot.toLowerCase().contains("am")) {
 			appointmentBookingService.bookAMSlot(appointment.getDoctorname(), appointment.getDate());
-		}
-		if (appointments.getSlot().equalsIgnoreCase("Noon slot") && "unbooked".equalsIgnoreCase(obj.getNoonstatus())) {
+		} else if (selectedSlot.toLowerCase().contains("noon") || (selectedSlot.toLowerCase().contains("pm") && (selectedSlot.contains("1.") || selectedSlot.contains("2.")))) {
 			appointmentBookingService.bookNoonSlot(appointment.getDoctorname(), appointment.getDate());
+		} else if (selectedSlot.toLowerCase().contains("pm")) {
+			appointmentBookingService.bookPMSlot(appointment.getDoctorname(), appointment.getDate());
 		}
 
 		return new ResponseEntity<>(appointments, HttpStatus.OK);
 	}
-
 //	public ResponseEntity<Appointments> addNewAppointment(@RequestBody Appointments appointment) throws Exception
 //	{
 //		String[] dateArr = appointment.getDate().split("-");
