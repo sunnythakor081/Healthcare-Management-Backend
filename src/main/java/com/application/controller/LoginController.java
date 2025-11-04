@@ -24,63 +24,60 @@ import com.application.util.JwtUtils;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-public class LoginController 
+public class LoginController
 {
 	@Autowired
 	private AdminService adminService;
 
 	@Autowired
 	private UserRegistrationService userRegisterService;
-	
+
 	@Autowired
-    private JwtUtils jwtUtil;
-	
-    @Autowired
-    private AuthenticationManager authenticationManager;
-	
+	private JwtUtils jwtUtil;
+
+	@Autowired
+	private AuthenticationManager authenticationManager;
+
 	@Autowired
 	private DoctorRegistrationService doctorRegisterService;
-	
+
 	@GetMapping("/")
-    public String welcomeMessage()
-    {
-    	return "Welcome to HealthCare Management system !!!";
-    }
-    
-    @PostMapping("/authenticate")
-//    @CrossOrigin(origins = "http://localhost:4200" +
-//			"")
-    public ResponseEntity<String> generateToken(@RequestBody AuthRequest authRequest) throws Exception 
-    {
-        try 
-        {
-        	System.out.println(authRequest.getEmail());
-        	System.out.println(authRequest.getPassword());
-        	List<User> users = userRegisterService.getAllUsers();
-        	String currentEmail = "";
-    		for(User obj:users)
-    		{
-    			if(obj.getEmail().equalsIgnoreCase(authRequest.getEmail()))
-    			{
-    				currentEmail = obj.getUsername();
-    			}
-    		}
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(currentEmail, authRequest.getPassword()));
-        } 
-        catch (Exception ex) 
-        {
-            throw new Exception("Invalid Username/password");
-        }
-        return new ResponseEntity<String>(jwtUtil.generateToken(authRequest.getEmail()), HttpStatus.OK);
-    }
-	
+	public String welcomeMessage()
+	{
+		return "Welcome to HealthCare Management system !!!";
+	}
+
+	@PostMapping("/authenticate")
+	public ResponseEntity<String> generateToken(@RequestBody AuthRequest authRequest) throws Exception
+	{
+		try
+		{
+			System.out.println(authRequest.getEmail());
+			System.out.println(authRequest.getPassword());
+			List<User> users = userRegisterService.getAllUsers();
+			String currentEmail = "";
+			for(User obj:users)
+			{
+				if(obj.getEmail().equalsIgnoreCase(authRequest.getEmail()))
+				{
+					currentEmail = obj.getUsername();
+				}
+			}
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(currentEmail, authRequest.getPassword()));
+		}
+		catch (Exception ex)
+		{
+			throw new Exception("Invalid Username/password");
+		}
+		return new ResponseEntity<String>(jwtUtil.generateToken(authRequest.getEmail()), HttpStatus.OK);
+	}
+
 	@PostMapping("/loginuser")
-//	@CrossOrigin(origins = "http://localhost:4200")
 	public User loginUser(@RequestBody User user) throws Exception
 	{
 		String currEmail = user.getEmail();
 		String currPassword = user.getPassword();
-		
+
 		User userObj = null;
 		if(currEmail != null && currPassword != null)
 		{
@@ -89,12 +86,11 @@ public class LoginController
 		if(userObj == null)
 		{
 			throw new Exception("User does not exists!!! Please enter valid credentials...");
-		}		
+		}
 		return userObj;
 	}
 
 	@PostMapping("/logindoctor")
-//	@CrossOrigin(origins = "http://localhost:4200")
 	public Doctor loginDoctor(@RequestBody Doctor doctor) throws Exception
 	{
 		String currEmail = doctor.getEmail();
@@ -112,26 +108,25 @@ public class LoginController
 		return doctorObj;
 	}
 
+	// UPDATED ADMIN LOGIN METHOD - Ye main change hai
 	@PostMapping("/loginadmin")
-//	@CrossOrigin(origins = "http://localhost:4200")
 	public String loginAdmin(@RequestBody AuthRequest authRequest) throws Exception
 	{
-		try {
-			authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
-			);
-		} catch (Exception ex) {
+		String inputEmail = authRequest.getEmail();
+		String inputPassword = authRequest.getPassword();
+
+		// Step 1: Email aur password se direct admin fetch kar (verify ke liye)
+		Admin admin = adminService.fetchAdminByEmailAndPassword(inputEmail, inputPassword);
+		if (admin == null) {
 			throw new Exception("Invalid username/password");
 		}
 
-		Admin admin = adminService.fetchAdminByEmailAndPassword(authRequest.getEmail(), authRequest.getPassword());
-		if (admin != null) {
-			return jwtUtil.generateToken(authRequest.getEmail());
-		} else {
-			throw new Exception("Invalid credentials");
+		// Step 2: Role check kar (optional, safe ke liye)
+		if (!"ADMIN".equals(admin.getRole())) {
+			throw new Exception("Invalid credentials or not an admin");
 		}
+
+		// Step 3: JWT generate kar email se (jaise pehle tha)
+		return jwtUtil.generateToken(inputEmail);
 	}
-
-
-
 }

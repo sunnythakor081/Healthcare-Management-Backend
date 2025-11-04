@@ -1,5 +1,6 @@
 package com.application.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class DoctorRegistrationService
 		doctorRegistrationRepo.rejectStatus(email);
 		System.out.print("rejected");
 	}
+
 	
 	public void updatePatientStatus(String slot, String doctorname)
 	{
@@ -67,10 +69,24 @@ public class DoctorRegistrationService
 	{
 		return doctorRegistrationRepo.findByEmailAndPassword(email, password);
 	}
-	
-	public List<Doctor> fetchProfileByEmail(String email)
-	{
-		return (List<Doctor>)doctorRegistrationRepo.findProfileByEmail(email);
+	public List<Doctor> getApprovedDoctors() {
+		System.out.println("Service: getApprovedDoctors called - Fetching all doctors..."); // Log start
+		List<Doctor> allDoctors = (List<Doctor>) doctorRegistrationRepo.findAll();
+		System.out.println("Service: Total doctors found: " + allDoctors.size()); // Total count
+
+		List<Doctor> approvedDoctors = new ArrayList<>();
+		for (Doctor doctor : allDoctors) {
+			System.out.println("Service: Checking doctor " + doctor.getEmail() + " - Status: " + doctor.getStatus()); // Per doctor log
+			if ("accept".equals(doctor.getStatus())) { // Exact match "accept"
+				approvedDoctors.add(doctor);
+			}
+		}
+		System.out.println("Service: Approved doctors count: " + approvedDoctors.size()); // Final count
+		return approvedDoctors;
+	}
+
+	public Doctor fetchProfileByEmail(String email) {
+		return doctorRegistrationRepo.findByEmail(email);
 	}
 
 }

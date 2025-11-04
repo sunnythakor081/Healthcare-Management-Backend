@@ -217,11 +217,13 @@ public class DoctorController {
 		// No code after catch—compiler sees all paths covered
 	}
 	@GetMapping("/doctorProfileDetails/{email}")
-//	@CrossOrigin(origins = "http://localhost:4205")
-	public ResponseEntity<List<Doctor>> getDoctorProfileDetails(@PathVariable String email) throws Exception
-	{
-		List<Doctor> doctors = doctorRegisterService.fetchProfileByEmail(email);
-		return new ResponseEntity<List<Doctor>>(doctors, HttpStatus.OK);
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity<Doctor> getDoctorProfileDetails(@PathVariable String email) throws Exception {
+		Doctor doctor = doctorRegisterService.fetchProfileByEmail(email);
+		if (doctor == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404 if no doctor found
+		}
+		return new ResponseEntity<>(doctor, HttpStatus.OK);
 	}
 	
 	@PutMapping("/updatedoctor")
@@ -230,6 +232,13 @@ public class DoctorController {
 	{
 		Doctor doctorobj = doctorRegisterService.updateDoctorProfile(doctor);
 		return new ResponseEntity<Doctor>(doctorobj, HttpStatus.OK);
+	}
+	@GetMapping("/doctors/approved")
+	public ResponseEntity<List<Doctor>> getApprovedDoctors() {
+		System.out.println("Controller: /doctors/approved endpoint called"); // Log call
+		List<Doctor> approved = doctorRegisterService.getApprovedDoctors(); // Service call
+		System.out.println("Controller: Returning " + approved.size() + " approved doctors"); // Log response
+		return ResponseEntity.ok(approved);
 	}
 	
 	@GetMapping("/patientlistbydoctoremailanddate/{email}")

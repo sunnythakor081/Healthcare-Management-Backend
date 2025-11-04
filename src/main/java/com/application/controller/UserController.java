@@ -52,7 +52,7 @@ public class UserController
 		return new ResponseEntity<List<Prescription>>(prescription, HttpStatus.OK);
 	}
 	
-	@GetMapping("/patientlistbyemail/{email}")
+		@GetMapping("/patientlistbyemail/{email}")
 //	@CrossOrigin(origins = "http://localhost:4205")
 	public ResponseEntity<List<Appointments>> getPatientList(@PathVariable String email) throws Exception
 	{
@@ -193,82 +193,7 @@ public class UserController
 
 		return new ResponseEntity<>(appointments, HttpStatus.OK);
 	}
-//	public ResponseEntity<Appointments> addNewAppointment(@RequestBody Appointments appointment) throws Exception
-//	{
-//		String[] dateArr = appointment.getDate().split("-");
-//		appointment.setDate(""+dateArr[0]+"-"+dateArr[1]+"-"+dateArr[2]);
-//		System.out.println(appointment.getDate());
-//		Appointments appointments = appointment;
-//
-//		List<Slots> availableSLots = appointmentBookingService.getSlotList();
-//		List<String> dates = new ArrayList<>();
-//		String message = "No slots available !!! Please check the slot availability and book again.";
-//		for(Slots obj : availableSLots)
-//		{
-//			dates.add(obj.getDate());
-//		}
-//		if(!dates.contains(appointments.getDate()))
-//		{
-//			throw new Exception("No slots available for this date !!! Please check the slot availability and book again.");
-//		}
-//		Slots obj = new Slots();
-//		for(Slots obj1 : availableSLots)
-//		{
-////			if(obj1.getDoctorname().equals(appointments.getDoctorname()) && obj1.getDate().equals(appointments.getDate()))
-////			{
-////				obj = obj1;
-////				break;
-////			}
-//			if(Objects.equals(obj1.getDoctorname(), appointments.getDoctorname())
-//					&& Objects.equals(obj1.getDate(), appointments.getDate())) {
-//				obj = obj1;
-//				break;
-//			}
-//
-//		}
-//			if(obj.getDoctorname().equals(appointments.getDoctorname()) && obj.getDate().equals(appointments.getDate()))
-//			{
-//				if(appointments.getSlot().equalsIgnoreCase("AM slot") && obj.getAmstatus().equalsIgnoreCase("booked"))
-//				{
-//					throw new Exception(message);
-//				}
-////				if(appointments.getSlot().equalsIgnoreCase("Pm slot") && obj.getPmslot().equalsIgnoreCase("booked"))
-////				{
-////					throw new Exception(message);
-////				}
-//				if(appointments.getSlot().equalsIgnoreCase("PM slot")
-//						&& "booked".equalsIgnoreCase(obj.getPmstatus())) {
-//					throw new Exception(message);
-//				}
-//				if(appointments.getSlot().equalsIgnoreCase("Noon slot") && obj.getNoonslot().equalsIgnoreCase("booked"))
-//				{
-//					throw new Exception(message);
-//				}
-//			}
-//			else
-//			{
-//				throw new Exception("The Doctor have no slots on that date !!! Please check the slot availability and book again.");
-//			}
-//		appointments = appointmentBookingService.addNewAppointment(appointment);
-//
-//		String patientID = getPatientID();
-//		appointmentBookingService.updatePatientId(patientID,appointment.getDoctorname(),appointment.getPatientname(),appointment.getDate());
-//
-//		if(appointment.getSlot().equalsIgnoreCase("Pm slot") && obj.getPmstatus().equalsIgnoreCase("unbooked"))
-//		{
-//			appointmentBookingService.bookPMSlot(appointment.getDoctorname(),appointment.getDate());
-//		}
-//		if(appointment.getSlot().equalsIgnoreCase("Am slot") && obj.getAmstatus().equalsIgnoreCase("unbooked"))
-//		{
-//			appointmentBookingService.bookAMSlot(appointment.getDoctorname(),appointment.getDate());
-//		}
-//		if(appointment.getSlot().equalsIgnoreCase("Noon slot") && obj.getNoonstatus().equalsIgnoreCase("unbooked"))
-//		{
-//			appointmentBookingService.bookNoonSlot(appointment.getDoctorname(),appointment.getDate());
-//		}
-//		return new ResponseEntity<Appointments>(appointments, HttpStatus.OK);
-//	}
-	
+
 	public String getPatientID()
 	{
 		String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"+"0123456789"+"abcdefghijklmnopqrstuvxyz";
