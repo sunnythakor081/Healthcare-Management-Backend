@@ -21,10 +21,10 @@ public class HealthcareManagementBackendApplication implements CommandLineRunner
 	@Override
 	public void run(String... args) throws Exception {
 		// Initialize default admin user if not exists
-		Admin existingAdmin = adminService.fetchAdminByEmail("admin@healthcare.com");
+		Admin existingAdmin = adminService.fetchAdminByEmail("admin@gmail.com");
 		if (existingAdmin == null) {
 			Admin admin = new Admin();
-			admin.setEmail("admin@healthcare.com");
+			admin.setEmail("admin@gmail.com");
 			admin.setUsername("admin");
 			admin.setPassword("admin123");
 			admin.setRole("ADMIN");
